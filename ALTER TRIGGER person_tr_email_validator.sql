@@ -14,10 +14,7 @@ ALTER TRIGGER [dbo].[person_tr_email_validator]
 ON [dbo].[person] for INSERT, UPDATE 
 AS 
 BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from interfering with SELECT statements.
 	SET NOCOUNT ON;
-	DECLARE @exclusions VARCHAR(1000)
-
 	IF EXISTS (--is invalid email?
 		SELECT email_address FROM inserted 
 		WHERE ISNULL(email_address,'')<>'' 
@@ -27,23 +24,14 @@ BEGIN
 		DECLARE @email VARCHAR(1000) = (SELECT email_address FROM inserted )
 		DECLARE @comment VARCHAR(1000)  = (SELECT email_address_comment FROM inserted )
 
-		/*
-		EXEC msdb.dbo.sp_send_dbmail 
-		@profile_name='Services',
-		--@recipients='emr@nextcare.com',
-		--@recipients='kevinfoster@nextcare.com;drewrichards@nextcare.com;chrisulrey@nextcare.com',
-		@recipients='kevinfoster@nextcare.com',
-		@body=@email,
-		@subject='Invalid email'; 
-		*/
-	
 		DECLARE @errmsg VARCHAR(4000) = '                          '+CHAR(10)+
-		--'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'+CHAR(10)+
 		CHAR(10)+
-		--'-------------------------------------------------------------------------------'+CHAR(10)+
-		'Invalid email address entered.  Please correct it or enter n/a in the comment field.  Expected syntax:  name@example.com'+CHAR(10)+CHAR(10)+
-		REPLICATE(' ',20)+'                                       Best regards, NextCare IT'+REPLICATE(' ',100)+CHAR(10)+CHAR(10)+CHAR(10)
-		--+'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'+CHAR(10)
+		'Invalid email address entered.  Please correct it or enter n/a in the comment field.  Expected syntax:  name@example.com'+CHAR(10)+
+		CHAR(10)+
+		REPLICATE(' ',20)+'                                       Best regards, NextCare IT'+REPLICATE(' ',100)+
+		CHAR(10)+
+		CHAR(10)+
+		CHAR(10)
 		
 		RAISERROR (@errmsg,11,1);
 	END
